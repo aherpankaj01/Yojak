@@ -2,17 +2,6 @@ import React, { useEffect, useState } from "react";
 import appwriteService from "../../appwrite/config";
 import { Container, PostCard } from "../../Component";
 
-// Skeleton card shown while posts are loading
-const SkeletonCard = () => (
-  <div className="w-full bg-white/5 rounded-xl overflow-hidden animate-pulse border border-white/5">
-    <div className="w-full bg-white/10" style={{ aspectRatio: "4/3" }} />
-    <div className="p-4 space-y-2">
-      <div className="h-4 bg-white/10 rounded w-3/4" />
-      <div className="h-4 bg-white/10 rounded w-1/2" />
-    </div>
-  </div>
-);
-
 function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +15,17 @@ function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (!loading && posts.length === 0) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white px-4">
+        <p className="animate-pulse text-base sm:text-lg text-center">
+          Loading posts...
+        </p>
+      </div>
+    );
+  }
+
+  if (posts.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white text-center px-4">
         <div>
@@ -54,9 +53,9 @@ function Home() {
         </div>
 
         <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {loading
-            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-            : posts.map((post) => <PostCard key={post.$id} {...post} />)}
+          {posts.map((post) => (
+            <PostCard key={post.$id} {...post} />
+          ))}
         </div>
       </Container>
     </div>
