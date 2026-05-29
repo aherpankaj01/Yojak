@@ -59,13 +59,9 @@ export default function Post() {
         <div className="relative w-full mb-6 sm:mb-8 rounded-xl overflow-hidden shadow-xl">
           {post.featuredImage && (
             <img
-              src={appwriteService.getFilePreview(featuredImage, 400, 250)}
-              alt={title}
-              loading="lazy"
-              className="w-full h-48 object-cover"
-              onError={(e) => {
-                e.target.src = "https://picsum.photos/400/250";
-              }}
+              src={appwriteService.getFilePreview(post.featuredImage)}
+              alt={post.title}
+              className="w-full h-60 sm:h-80 md:h-96 object-cover"
             />
           )}
 
