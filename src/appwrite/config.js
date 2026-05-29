@@ -1,5 +1,13 @@
 import conf from "../conf/conf";
-import { Client, ID, Databases, Storage, Query } from "appwrite";
+import {
+  Client,
+  ID,
+  Databases,
+  Storage,
+  Query,
+  ImageGravity,
+  ImageFormat,
+} from "appwrite";
 
 export class Service {
   client = new Client();
@@ -115,7 +123,29 @@ export class Service {
     }
   }
 
+  // Card thumbnails: resized to 400x300, WebP format — much smaller download
   getFilePreview(fileId) {
+    return this.bucket
+      .getFilePreview(
+        conf.appwriteBucketId,
+        fileId,
+        400,
+        300,
+        ImageGravity.Center,
+        80,
+        0,
+        "0",
+        0,
+        0,
+        0,
+        "0",
+        ImageFormat.Webp,
+      )
+      .toString();
+  }
+
+  // Full-resolution for the post detail page
+  getFileView(fileId) {
     return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
   }
 }
