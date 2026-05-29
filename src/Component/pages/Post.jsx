@@ -59,8 +59,14 @@ export default function Post() {
         <div className="relative w-full mb-6 sm:mb-8 rounded-xl overflow-hidden shadow-xl">
           {post.featuredImage && (
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={appwriteService.getFilePreview(
+                post.featuredImage,
+                1200,
+                700,
+              )}
               alt={post.title}
+              loading="lazy"
+              decoding="async"
               className="w-full h-60 sm:h-80 md:h-96 object-cover"
             />
           )}
