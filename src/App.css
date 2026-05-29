@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent invisible text during font load */
+* {
+  font-display: swap;
+}
+
+/* Better image rendering across the app */
+img {
+  image-rendering: auto;
+}
+
+/* Prevent layout shift from scrollbar appearing */
+html {
+  overflow-y: scroll;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

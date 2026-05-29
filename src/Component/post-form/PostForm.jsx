@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
@@ -6,6 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function PostForm({ post }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(
+    post?.featuredImage
+      ? appwriteService.getFilePreview(post.featuredImage, 600, 400)
+      : null,
+  );
+
   const { register, handleSubmit, watch, setValue, control, getValues } =
     useForm({
       defaultValues: {
@@ -20,38 +27,38 @@ export default function PostForm({ post }) {
   const userData = useSelector((state) => state.auth.userData);
 
   const submit = async (data) => {
-    if (post) {
-      const file = data.image[0]
-        ? await appwriteService.uploadFile(data.image[0])
-        : null;
+    setSubmitting(true);
+    try {
+      if (post) {
+        const file = data.image[0]
+          ? await appwriteService.uploadFile(data.image[0])
+          : null;
 
-      if (file) {
-        appwriteService.deleteFile(post.featuredImage);
-      }
+        if (file) {
+          appwriteService.deleteFile(post.featuredImage);
+        }
 
-      const dbPost = await appwriteService.updatePost(post.$id, {
-        ...data,
-        featuredImage: file ? file.$id : undefined,
-      });
-
-      if (dbPost) {
-        navigate(`/post/${dbPost.$id}`);
-      }
-    } else {
-      const file = await appwriteService.uploadFile(data.image[0]);
-
-      if (file) {
-        const fileId = file.$id;
-        data.featuredImage = fileId;
-        const dbPost = await appwriteService.createPost({
+        const dbPost = await appwriteService.updatePost(post.$id, {
           ...data,
-          userId: userData.$id,
+          featuredImage: file ? file.$id : undefined,
         });
 
-        if (dbPost) {
-          navigate(`/post/${dbPost.$id}`);
+        if (dbPost) navigate(`/post/${dbPost.$id}`);
+      } else {
+        const file = await appwriteService.uploadFile(data.image[0]);
+
+        if (file) {
+          data.featuredImage = file.$id;
+          const dbPost = await appwriteService.createPost({
+            ...data,
+            userId: userData.$id,
+          });
+
+          if (dbPost) navigate(`/post/${dbPost.$id}`);
         }
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -64,7 +71,6 @@ export default function PostForm({ post }) {
         .replace(/\s/g, "-")
         .slice(0, 36)
         .replace(/-+$/, "");
-
     return "";
   }, []);
 
@@ -74,13 +80,22 @@ export default function PostForm({ post }) {
         setValue("slug", slugTransform(value.title), { shouldValidate: true });
       }
     });
-
     return () => subscription.unsubscribe();
   }, [watch, slugTransform, setValue]);
 
+  // Live local preview when user picks a new image
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-      <div className="w-2/3 px-2">
+    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap gap-y-6">
+      {/* Left — main content */}
+      <div className="w-full md:w-2/3 px-2">
         <Input
           label="Title :"
           placeholder="Title"
@@ -105,31 +120,49 @@ export default function PostForm({ post }) {
           defaultValue={getValues("content")}
         />
       </div>
-      <div className="w-1/3 px-2">
+
+      {/* Right — image & settings */}
+      <div className="w-full md:w-1/3 px-2">
         <Input
           label="Featured Image :"
           type="file"
           className="mb-4"
-          accept="image/png, image/jpg, image/jpeg, image/gif"
+          accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
           {...register("image", { required: !post })}
+          onChange={(e) => {
+            register("image").onChange(e);
+            handleImageChange(e);
+          }}
         />
-        {post && (
-          <div className="w-full mb-4">
+
+        {/* Image preview with fixed aspect ratio — no layout shift */}
+        {previewUrl && (
+          <div
+            className="w-full mb-4 rounded-lg overflow-hidden bg-white/5 border border-white/10"
+            style={{ aspectRatio: "3/2" }}
+          >
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
-              alt={post.title}
-              className="rounded-lg"
+              src={previewUrl}
+              alt={post?.title || "Preview"}
+              width={600}
+              height={400}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
             />
           </div>
         )}
+
         <Select
           options={["active", "inactive"]}
           label="Status"
           className="mb-4"
           {...register("status", { required: true })}
         />
+
         <Button
           type="submit"
+          loading={submitting}
           bgColor={post ? "bg-green-500" : undefined}
           className="w-full"
         >
