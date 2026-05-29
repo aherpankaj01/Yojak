@@ -4,6 +4,15 @@ import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import imageCompression from "browser-image-compression";
+
+const compressImage = async (file) => {
+  return await imageCompression(file, {
+    maxSizeMB: 0.3,
+    maxWidthOrHeight: 800,
+    useWebWorker: true,
+  });
+};
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } =
@@ -21,31 +30,30 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     if (post) {
-      // Only upload a new file if the user actually selected one
-      const newFile = data.image[0]
-        ? await appwriteService.uploadFile(data.image[0])
-        : null;
+      let file = null;
+      if (data.image[0]) {
+        const compressed = await compressImage(data.image[0]);
+        file = await appwriteService.uploadFile(compressed);
+      }
 
-      if (newFile) {
-        // Delete old image only after successfully uploading new one
+      if (file) {
         await appwriteService.deleteFile(post.featuredImage);
       }
 
       const dbPost = await appwriteService.updatePost(post.$id, {
         ...data,
-        // Keep existing featuredImage if no new file was selected
-        featuredImage: newFile ? newFile.$id : post.featuredImage,
+        featuredImage: file ? file.$id : post.featuredImage,
       });
 
       if (dbPost) {
         navigate(`/post/${dbPost.$id}`);
       }
     } else {
-      const file = await appwriteService.uploadFile(data.image[0]);
+      const compressed = await compressImage(data.image[0]);
+      const file = await appwriteService.uploadFile(compressed);
 
       if (file) {
-        const fileId = file.$id;
-        data.featuredImage = fileId;
+        data.featuredImage = file.$id;
         const dbPost = await appwriteService.createPost({
           ...data,
           userId: userData.$id,
