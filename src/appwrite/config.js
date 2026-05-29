@@ -123,24 +123,18 @@ export class Service {
     }
   }
 
-  // Card thumbnails: resized to 400x300, WebP format — much smaller download
+  // Card thumbnails — only pass the params we actually need
   getFilePreview(fileId) {
     return this.bucket
-      .getFilePreview(
-        conf.appwriteBucketId,
-        fileId,
-        400,
-        300,
-        ImageGravity.Center,
-        80,
-        0,
-        "0",
-        0,
-        0,
-        0,
-        "0",
-        ImageFormat.Webp,
-      )
+      .getFilePreview({
+        bucketId: conf.appwriteBucketId,
+        fileId: fileId,
+        width: 400,
+        height: 300,
+        gravity: ImageGravity.Center,
+        quality: 80,
+        output: ImageFormat.Webp,
+      })
       .toString();
   }
 
