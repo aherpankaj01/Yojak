@@ -1,13 +1,5 @@
 import conf from "../conf/conf";
-import {
-  Client,
-  ID,
-  Databases,
-  Storage,
-  Query,
-  ImageGravity,
-  ImageFormat,
-} from "appwrite";
+import { Client, ID, Databases, Storage, Query } from "appwrite";
 
 export class Service {
   client = new Client();
@@ -123,22 +115,10 @@ export class Service {
     }
   }
 
-  // Card thumbnails — only pass the params we actually need
   getFilePreview(fileId) {
-    return this.bucket
-      .getFilePreview({
-        bucketId: conf.appwriteBucketId,
-        fileId: fileId,
-        width: 400,
-        height: 300,
-        gravity: ImageGravity.Center,
-        quality: 80,
-        output: ImageFormat.Webp,
-      })
-      .toString();
+    return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
   }
 
-  // Full-resolution for the post detail page
   getFileView(fileId) {
     return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
   }
