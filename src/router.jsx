@@ -13,14 +13,9 @@ const AllPost = lazy(() => import("./Component/pages/AllPost.jsx"));
 const AuthLayout = lazy(() => import("./Component/AuthLayout.jsx"));
 const Login = lazy(() => import("./Component/Login.jsx"));
 
+// Wrapper (no repetition)
 const withSuspense = (Component) => (
-  <Suspense
-    fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-      </div>
-    }
-  >
+  <Suspense fallback={<div>Loading...</div>}>
     <Component />
   </Suspense>
 );
@@ -28,21 +23,14 @@ const withSuspense = (Component) => (
 export const router = createBrowserRouter([
   {
     path: "/",
-    // App is the layout shell — never wrap it in Suspense/lazy
-    element: <App />,
+    element: withSuspense(App),
     children: [
       { path: "/", element: withSuspense(Home) },
 
       {
         path: "/login",
         element: (
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-gray-900">
-                <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div>Loading...</div>}>
             <AuthLayout authentication={false}>
               <Login />
             </AuthLayout>
@@ -53,13 +41,7 @@ export const router = createBrowserRouter([
       {
         path: "/signup",
         element: (
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-gray-900">
-                <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div>Loading...</div>}>
             <AuthLayout authentication={false}>
               <Signup />
             </AuthLayout>
@@ -70,13 +52,7 @@ export const router = createBrowserRouter([
       {
         path: "/all-posts",
         element: (
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-gray-900">
-                <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div>Loading...</div>}>
             <AuthLayout authentication>
               <AllPost />
             </AuthLayout>
@@ -87,13 +63,7 @@ export const router = createBrowserRouter([
       {
         path: "/add-post",
         element: (
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-gray-900">
-                <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div>Loading...</div>}>
             <AuthLayout authentication>
               <AddPost />
             </AuthLayout>
@@ -104,13 +74,7 @@ export const router = createBrowserRouter([
       {
         path: "/edit-post/:slug",
         element: (
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-gray-900">
-                <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div>Loading...</div>}>
             <AuthLayout authentication>
               <EditPost />
             </AuthLayout>

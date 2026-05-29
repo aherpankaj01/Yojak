@@ -13,9 +13,6 @@ const PostCard = ({ $id, title, featuredImage }) => {
         <img
           src={imageUrl}
           alt={title}
-          loading="lazy"
-          width={400}
-          height={192}
           className="w-full h-48 object-cover"
           onError={(e) => {
             e.target.src = "https://picsum.photos/400/300";

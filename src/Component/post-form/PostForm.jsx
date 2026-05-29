@@ -4,15 +4,6 @@ import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import imageCompression from "browser-image-compression";
-
-const compressImage = async (file) => {
-  return await imageCompression(file, {
-    maxSizeMB: 0.3,
-    maxWidthOrHeight: 800,
-    useWebWorker: true,
-  });
-};
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } =
@@ -30,30 +21,28 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     if (post) {
-      let file = null;
-      if (data.image[0]) {
-        const compressed = await compressImage(data.image[0]);
-        file = await appwriteService.uploadFile(compressed);
-      }
+      const file = data.image[0]
+        ? await appwriteService.uploadFile(data.image[0])
+        : null;
 
       if (file) {
-        await appwriteService.deleteFile(post.featuredImage);
+        appwriteService.deleteFile(post.featuredImage);
       }
 
       const dbPost = await appwriteService.updatePost(post.$id, {
         ...data,
-        featuredImage: file ? file.$id : post.featuredImage,
+        featuredImage: file ? file.$id : undefined,
       });
 
       if (dbPost) {
         navigate(`/post/${dbPost.$id}`);
       }
     } else {
-      const compressed = await compressImage(data.image[0]);
-      const file = await appwriteService.uploadFile(compressed);
+      const file = await appwriteService.uploadFile(data.image[0]);
 
       if (file) {
-        data.featuredImage = file.$id;
+        const fileId = file.$id;
+        data.featuredImage = fileId;
         const dbPost = await appwriteService.createPost({
           ...data,
           userId: userData.$id,
