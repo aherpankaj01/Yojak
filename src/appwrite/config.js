@@ -79,7 +79,7 @@ export class Service {
     }
   }
 
-  async getPosts(queries = [Query.equal("status", "active"), Query.limit(6)]) {
+  async getPosts(queries = [Query.equal("status", "active")]) {
     try {
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
@@ -116,7 +116,7 @@ export class Service {
   }
 
   getFilePreview(fileId) {
-    return this.bucket.getFilePreview(conf.appwriteBucketId, fileId).toString();
+    return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
   }
 }
 
