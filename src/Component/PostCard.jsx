@@ -1,31 +1,35 @@
-import React from "react";
 import appwriteService from "../appwrite/config";
 import { Link } from "react-router-dom";
-
 const PostCard = ({ $id, title, featuredImage }) => {
   const imageUrl = featuredImage
-    ? appwriteService.getFilePreview(featuredImage)
-    : "https://picsum.photos/400/300";
-
+    ? appwriteService.getFilePreview(featuredImage, 400, 250)
+    : "https://picsum.photos/400/250";
   return (
     <Link to={`/post/${$id}`}>
-      <div className="w-full bg-white/10 rounded-xl overflow-hidden hover:scale-105 transition">
+      {" "}
+      <div className="w-full bg-white/10 rounded-xl overflow-hidden hover:scale-105 transition duration-300">
+        {" "}
         <img
           src={imageUrl}
           alt={title}
+          loading="lazy"
+          width="400"
+          height="250"
+          decoding="async"
           className="w-full h-48 object-cover"
           onError={(e) => {
-            e.target.src = "https://picsum.photos/400/300";
+            e.target.src = "https://picsum.photos/400/250";
           }}
-        />
+        />{" "}
         <div className="p-4">
+          {" "}
           <h2 className="text-white font-semibold line-clamp-2">
-            {title || "Untitled"}
-          </h2>
-        </div>
-      </div>
+            {" "}
+            {title || "Untitled"}{" "}
+          </h2>{" "}
+        </div>{" "}
+      </div>{" "}
     </Link>
   );
 };
-
 export default PostCard;

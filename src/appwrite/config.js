@@ -115,8 +115,10 @@ export class Service {
     }
   }
 
-  getFilePreview(fileId) {
-    return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
+  getFilePreview(fileId, width = 800, height = 500) {
+    return this.bucket
+      .getFilePreview(conf.appwriteBucketId, fileId, width, height)
+      .toString();
   }
 }
 

@@ -116,9 +116,10 @@ export default function PostForm({ post }) {
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={appwriteService.getFilePreview(post.featuredImage, 800, 500)}
               alt={post.title}
-              className="rounded-lg"
+              loading="lazy"
+              className="rounded-lg w-full h-auto object-cover"
             />
           </div>
         )}

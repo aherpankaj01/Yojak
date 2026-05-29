@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import appwriteService from "../../appwrite/config";
 import { Button, Container } from "../../Component";
@@ -59,9 +59,10 @@ export default function Post() {
         <div className="relative w-full mb-6 sm:mb-8 rounded-xl overflow-hidden shadow-xl">
           {post.featuredImage && (
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={appwriteService.getFilePreview(post.featuredImage, 800, 500)}
               alt={post.title}
-              className="w-full h-60 sm:h-80 md:h-96 object-cover"
+              loading="lazy"
+              className="rounded-lg w-full h-auto object-cover"
             />
           )}
 
